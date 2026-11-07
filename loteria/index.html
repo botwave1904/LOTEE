@@ -1,39 +1,65 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <title>Lotería del Horror Moderno 2.0</title>
-<meta name="description" content="Lotería del Horror Moderno 2.0: play the 54-card horror remix of the traditional Mexican lotería in your browser, offline.">
-<meta name="theme-color" content="#3a0a0c">
-<meta name="color-scheme" content="dark">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="lotee">
-<meta name="application-name" content="lotee">
-<meta name="format-detection" content="telephone=no">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
-<link rel="apple-touch-icon" href="assets/icons/icon-180.png">
-<link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-152.png">
-<link rel="apple-touch-icon" sizes="167x167" href="assets/icons/icon-167.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180.png">
-<link rel="preload" href="assets/fonts/Ultra.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="data/cards.json" as="fetch" crossorigin>
-<link rel="stylesheet" href="../assets/site.css">
-<link rel="stylesheet" href="css/style.css">
+<meta content="Lotería del Horror Moderno 2.0: play the 54-card horror remix of the traditional Mexican lotería in your browser, offline." data-en-content="Lotería del Horror Moderno 2.0: play the 54-card horror remix of the traditional Mexican lotería in your browser, offline." data-es-content="Lotería del Horror Moderno 2.0: juega sin conexión en tu navegador con las 54 cartas de horror moderno de la lotería tradicional mexicana." name="description"/>
+<meta content="#3a0a0c" name="theme-color"/>
+<meta content="dark" name="color-scheme"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="lotee" name="apple-mobile-web-app-title"/>
+<meta content="lotee" name="application-name"/>
+<meta content="telephone=no" name="format-detection"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/icons/icon-180.png" rel="apple-touch-icon"/>
+<link href="assets/icons/icon-152.png" rel="apple-touch-icon" sizes="152x152"/>
+<link href="assets/icons/icon-167.png" rel="apple-touch-icon" sizes="167x167"/>
+<link href="assets/icons/icon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+<link as="font" crossorigin="" href="assets/fonts/Ultra.woff2" rel="preload" type="font/woff2"/>
+<link as="fetch" crossorigin="" href="data/cards.json" rel="preload"/>
+<link href="../assets/site.css" rel="stylesheet"/>
+<link href="css/style.css" rel="stylesheet"/>
 <style>body.card-game{display:flex;flex-direction:column;height:100dvh}body.card-game #app{flex:1;min-height:0;height:auto}body.card-game>.universe-nav{flex:none;position:relative;z-index:30}</style>
-<meta property="og:title" content="Lotería del Horror Moderno 2.0"><meta property="og:image" content="https://botwave1904.github.io/LOTEE/assets/og-lotee.jpg"><meta property="og:url" content="https://botwave1904.github.io/LOTEE/loteria/">
-</head>
+<meta content="Lotería del Horror Moderno 2.0" property="og:title"/><meta content="https://botwave1904.github.io/LOTEE/assets/og-lotee.jpg" data-en-content="https://botwave1904.github.io/LOTEE/assets/og-lotee.jpg" data-es-content="https://botwave1904.github.io/LOTEE/assets/og-lotee-es.jpg" property="og:image"/><meta content="https://botwave1904.github.io/LOTEE/loteria/" property="og:url"/>
+<style>html[data-language-loading] body{visibility:hidden}</style><script>/* One explicit origin-wide choice. Never infer a locale from the browser. */
+(() => {
+ 'use strict';
+ const KEY='botwave.language.explicit.v1';
+ let lang='en';
+ try {const saved=localStorage.getItem(KEY);if(saved==='es'||saved==='en')lang=saved;}catch{}
+ document.documentElement.lang=lang;
+ if(lang==='es')document.documentElement.setAttribute('data-language-loading','');
+ function apply(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-en][data-es]').forEach(el=>{el.textContent=el.getAttribute('data-'+lang);});
+  for(const attr of ['content','aria-label','alt','title'])document.querySelectorAll('[data-en-'+attr+']').forEach(el=>el.setAttribute(attr,el.getAttribute('data-'+lang+'-'+attr)));
+  document.querySelectorAll('[data-site-language]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.siteLanguage===lang)));
+  document.documentElement.removeAttribute('data-language-loading');
+ }
+ function choose(value,origin='site',persist=true){
+  if(value!=='en'&&value!=='es')return;
+  lang=value;if(persist)try{localStorage.setItem(KEY,value);}catch{}
+  apply();window.dispatchEvent(new CustomEvent('botwave:language',{detail:{lang,origin}}));
+ }
+ window.BotwaveLocale={KEY,get lang(){return lang;},choose,apply};
+ document.addEventListener('click',e=>{const button=e.target.closest('button[data-site-language]');if(button)choose(button.dataset.siteLanguage);});
+ document.addEventListener('DOMContentLoaded',apply,{once:true});
+ window.addEventListener('storage',e=>{if(e.key===KEY)choose(e.newValue==='es'?'es':'en','storage',false);});
+})();
+</script><meta content="en_US" data-en-content="en_US" data-es-content="es_MX" property="og:locale"/></head>
 <body class="card-game">
-<header class="universe-nav"><a class="brand" href="../">LOTEE</a><nav aria-label="Universo"><a href="https://botwave1904.github.io/">Estudio</a><a aria-current="page" href="./">Lotería</a><a href="../nadie-mira-arriba/">Nadie Mira Arriba</a></nav></header>
-<div class="atmo" aria-hidden="true"><div class="candle"></div><div class="scan"></div><div class="vignette"></div></div>
-<main id="app" aria-live="polite">
-  <noscript><p style="padding:2rem">Esta lotería necesita JavaScript. / This game needs JavaScript.</p></noscript>
-  <div class="boot"><div class="boot-title">Lotería</div></div>
+<header class="universe-nav"><a class="brand" href="../">LOTEE</a><nav aria-label="Universe" data-en-aria-label="Universe" data-es-aria-label="Universo"><a href="https://botwave1904.github.io/"><span data-en="Studio" data-es="Estudio">Studio</span></a><a aria-current="page" href="./">Lotería</a><a href="../nadie-mira-arriba/">Nadie Mira Arriba</a></nav><div aria-label="Language" class="locale-control" data-en-aria-label="Language" data-es-aria-label="Idioma" role="group"><button aria-label="Switch to English" aria-pressed="true" data-en-aria-label="Switch to English" data-es-aria-label="Cambiar a inglés" data-site-language="en" lang="en" type="button">EN</button><button aria-label="Switch to Spanish" aria-pressed="false" data-en-aria-label="Switch to Spanish" data-es-aria-label="Cambiar a español" data-site-language="es" lang="es" type="button">ES</button></div></header>
+<div aria-hidden="true" class="atmo"><div class="candle"></div><div class="scan"></div><div class="vignette"></div></div>
+<main aria-live="polite" id="app">
+<noscript><p style="padding:2rem"><span data-en="This game needs JavaScript." data-es="Este juego necesita JavaScript.">This game needs JavaScript.</span></p></noscript>
+<div class="boot"><div class="boot-title">Lotería</div></div>
 </main>
-<div id="toast" role="status" aria-live="assertive"></div>
+<div aria-live="assertive" id="toast" role="status"></div>
 <script src="js/app.js"></script>
 </body>
 </html>

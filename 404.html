@@ -1,1 +1,27 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>404 — lotee</title><style>body{margin:0;background:#171525;color:#f8edcf;font:18px/1.7 system-ui}main{max-width:56ch;margin:18vh auto;padding:24px}small,a{color:#ffdc75}h1{font-size:clamp(2rem,6vw,4rem);line-height:1.1}a:focus-visible{outline:3px solid #ffdc75;outline-offset:5px}</style></head><body><main><small>lotee / 404</small><h1>Esta carta no está en la baraja.</h1><p>La dirección no existe. Vuelve al inicio para elegir otro camino.</p><a href="https://botwave1904.github.io/LOTEE/">Volver al inicio →</a></main></body></html>
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>404 — lotee</title><style>body{margin:0;background:#171525;color:#f8edcf;font:18px/1.7 system-ui}main{max-width:56ch;margin:18vh auto;padding:24px}small,a{color:#ffdc75}h1{font-size:clamp(2rem,6vw,4rem);line-height:1.1}a:focus-visible{outline:3px solid #ffdc75;outline-offset:5px}</style><style>html[data-language-loading] body{visibility:hidden}</style><script>/* One explicit origin-wide choice. Never infer a locale from the browser. */
+(() => {
+ 'use strict';
+ const KEY='botwave.language.explicit.v1';
+ let lang='en';
+ try {const saved=localStorage.getItem(KEY);if(saved==='es'||saved==='en')lang=saved;}catch{}
+ document.documentElement.lang=lang;
+ if(lang==='es')document.documentElement.setAttribute('data-language-loading','');
+ function apply(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-en][data-es]').forEach(el=>{el.textContent=el.getAttribute('data-'+lang);});
+  for(const attr of ['content','aria-label','alt','title'])document.querySelectorAll('[data-en-'+attr+']').forEach(el=>el.setAttribute(attr,el.getAttribute('data-'+lang+'-'+attr)));
+  document.querySelectorAll('[data-site-language]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.siteLanguage===lang)));
+  document.documentElement.removeAttribute('data-language-loading');
+ }
+ function choose(value,origin='site',persist=true){
+  if(value!=='en'&&value!=='es')return;
+  lang=value;if(persist)try{localStorage.setItem(KEY,value);}catch{}
+  apply();window.dispatchEvent(new CustomEvent('botwave:language',{detail:{lang,origin}}));
+ }
+ window.BotwaveLocale={KEY,get lang(){return lang;},choose,apply};
+ document.addEventListener('click',e=>{const button=e.target.closest('button[data-site-language]');if(button)choose(button.dataset.siteLanguage);});
+ document.addEventListener('DOMContentLoaded',apply,{once:true});
+ window.addEventListener('storage',e=>{if(e.key===KEY)choose(e.newValue==='es'?'es':'en','storage',false);});
+})();
+</script><meta content="en_US" data-en-content="en_US" data-es-content="es_MX" property="og:locale"/><link href="/LOTEE/assets/site.css" rel="stylesheet"/></head><body><main><div aria-label="Language" class="locale-control" data-en-aria-label="Language" data-es-aria-label="Idioma" role="group"><button aria-label="Switch to English" aria-pressed="true" data-en-aria-label="Switch to English" data-es-aria-label="Cambiar a inglés" data-site-language="en" lang="en" type="button">EN</button><button aria-label="Switch to Spanish" aria-pressed="false" data-en-aria-label="Switch to Spanish" data-es-aria-label="Cambiar a español" data-site-language="es" lang="es" type="button">ES</button></div><small>lotee / 404</small><h1><span data-en="This card is not in the deck." data-es="Esta carta no está en la baraja.">This card is not in the deck.</span></h1><p><span data-en="This address does not exist. Return home to choose another path." data-es="La dirección no existe. Vuelve al inicio para elegir otro camino.">This address does not exist. Return home to choose another path.</span></p><a href="https://botwave1904.github.io/LOTEE/"><span data-en="Back home →" data-es="Volver al inicio →">Back home →</span></a></main></body></html>

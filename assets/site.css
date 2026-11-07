@@ -30,3 +30,21 @@ h1{font-size:clamp(2.65rem,6.4vw,5.1rem);letter-spacing:-.045em;font-weight:700}
 }
 
 @layer components{@media(min-width:850px){.fan img{height:72%;top:14%}}}
+@layer components{
+.locale-control{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--b-line,#6a5c72);border-radius:5px;padding:3px;white-space:nowrap;font-family:Lato,system-ui,sans-serif;width:max-content}
+.locale-control button{appearance:none;cursor:pointer;border:0;border-radius:3px;background:transparent;color:var(--b-dim,#b9b3c6);font:700 .75rem/1 Lato,system-ui,sans-serif;min-width:38px;min-height:36px;padding:.55rem .6rem}
+.locale-control button[aria-pressed=true]{background:var(--b-gold,#ffdc75);color:var(--b-ink,#171525)}
+.locale-control button:hover{color:var(--b-cream,#f8edcf);background:#ffffff16}.locale-control button[aria-pressed=true]:hover{background:#ffe7a1;color:#171525}
+}
+@layer layout{
+.site-header>.site-nav{margin-left:auto}.site-header>.locale-control{margin-left:.3rem}.universe-nav>.locale-control{margin-left:auto}.universe-nav>nav{margin-left:auto}
+@media(max-width:600px){
+.site-header,.universe-nav{display:grid;grid-template-columns:1fr auto;gap:.3rem 1rem;padding-block:.65rem}
+.site-header>.site-nav,.universe-nav>nav{grid-column:1/-1;grid-row:2;justify-content:space-between;margin-left:0;gap:.6rem}
+.site-header>.locale-control,.universe-nav>.locale-control{grid-column:2;grid-row:1;margin:0}
+}
+}
+/* The PWA's unlayered base button reset must not erase the shared control's contrast. */
+.card-game .universe-nav .locale-control button{font:700 .75rem/1 Lato,system-ui,sans-serif;color:#b9b3c6}
+.card-game .universe-nav .locale-control button[aria-pressed=true]{color:#171525;background:#ffdc75}
+@layer components{@media(max-width:600px){.universe-nav{display:grid;grid-template-columns:1fr auto;gap:.3rem 1rem;padding-block:.65rem}}}

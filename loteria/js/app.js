@@ -8,10 +8,18 @@ var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { ret
 var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- settings ---------- */
-var DEF = { lang: 'es', voice: true, sfx: true, drone: false, auto: false, speed: 'normal', calm: reduceMotion };
+var DEF = { lang: 'en', voice: true, sfx: true, drone: false, auto: false, speed: 'normal', calm: reduceMotion };
 var S = Object.assign({}, DEF);
-try { Object.assign(S, JSON.parse(localStorage.getItem('lotee.settings') || '{}')); } catch (e) {}
-function save() { try { localStorage.setItem('lotee.settings', JSON.stringify(S)); } catch (e) {} applyCalm(); }
+var LANGUAGE_KEY = 'botwave.language.explicit.v1';
+// Keep sound/accessibility settings, but never inherit the old implicit Spanish default.
+try { var savedSettings = JSON.parse(localStorage.getItem('lotee.settings') || '{}') || {}; delete savedSettings.lang; Object.assign(S, savedSettings); } catch (e) {}
+try { var explicitLanguage = localStorage.getItem(LANGUAGE_KEY); S.lang = explicitLanguage === 'es' ? 'es' : 'en'; } catch (e) {}
+function chooseLanguage(lang) {
+ S.lang = lang === 'es' ? 'es' : 'en'; document.documentElement.lang = S.lang;
+ if (window.BotwaveLocale) window.BotwaveLocale.choose(S.lang, 'card-game');
+ else try { localStorage.setItem(LANGUAGE_KEY, S.lang); } catch (e) {}
+}
+function save() { try { var settings = Object.assign({}, S); delete settings.lang; localStorage.setItem('lotee.settings', JSON.stringify(settings)); } catch (e) {} applyCalm(); }
 function applyCalm() { document.body.classList.toggle('calm', !!S.calm); }
 var SPEEDS = { manual: 0, slow: 9000, normal: 6000, fast: 3500 };
 
@@ -29,24 +37,24 @@ var T = {
   verifyTitle:'¿Qué tabla gritó?', verifyOk:'¡Buena! Completó', verifyNo:'Todavía no completa ninguna figura.', twist:'El giro', story:'La historia', trad:'Carta tradicional',
   grito:'Grito', you:'Tú', player:'Jugador', turnOf:'Tablero de', away:'le falta 1', out:'fuera', strikes:'avisos', newRound:'Nueva ronda', callerStart:'Toca “Siguiente” para cantar la primera carta.',
   pats:{ row:'Línea (fila)', col:'Columna', diag:'Diagonal', corners:'Cuatro esquinas', centro:'Centro', llena:'Llena' },
-  cardsLeft:'quedan', printed:'Tablas impresas 1–12', randomBoards:'Tablas al azar', ai:'rival', soundOn:'Sonido', backToGame:'Volver al juego'
+  cardsLeft:'quedan', printed:'Tablas impresas 1–12', randomBoards:'Tablas al azar', ai:'rival', board:'Tabla', soundOn:'Sonido', backToGame:'Volver al juego'
  },
- en: { sub:'of Modern Horror', solo:'Play vs. rivals', pass:'Pass & play', caller:'Caller mode', baraja:'The Deck', rules:'How to play', settings:'Settings',
+ en: { sub:'del Horror Moderno', solo:'Play vs. rivals', pass:'Pass & play', caller:'Caller mode', baraja:'The Deck', rules:'How to play', settings:'Settings',
   install:'Install on your phone', iosHint:'On iPhone: Share ⎋ → “Add to Home Screen”.', offline:'Works offline. No ads, no tracking.',
-  setupSolo:'Versus rivals', setupPass:'Pass & play', pattern:'Winning pattern', tabla:'Your tabla', random:'Random', rivals:'Rivals', players:'Players',
+  setupSolo:'Versus rivals', setupPass:'Pass & play', pattern:'Winning pattern', tabla:'Your board', random:'Random', rivals:'Rivals', players:'Players',
   names:'Names', speed:'Caller speed', manual:'Manual', slow:'Slow', normal:'Normal', fast:'Fast', automark:'Auto-mark assist',
   start:'Start!', back:'Back', next:'Next card', pause:'Pause', play:'Resume', lot:'¡Lotería!', called:'called', of:'of',
   waiting:'Tap “Next card” for the first card', ready:'Pattern complete! Shout lotería', menu:'Menu', resume:'Keep playing', restart:'New round', quit:'Back to title',
   falseClaim:'False lotería! Warning: a second one puts you out.', outRound:'Out for this round for false claims!', youWin:'You win!', wins:'wins',
   winCard:'On the card', deckEnd:'The deck is empty.', voice:'Caller voice', sfx:'Sound effects', drone:'Ambient drone', calm:'Fewer effects (no flicker)',
-  language:'Language', close:'Close', undo:'Undo', shuffle:'Reshuffle', verify:'Check a tabla', fullscreen:'Full screen',
-  verifyTitle:'Which tabla called it?', verifyOk:'Good! It completes', verifyNo:'No pattern completed yet.', twist:'The twist', story:'The story', trad:'Traditional card',
+  language:'Language', close:'Close', undo:'Undo', shuffle:'Reshuffle', verify:'Check a board', fullscreen:'Full screen',
+  verifyTitle:'Which board called it?', verifyOk:'Good! It completes', verifyNo:'No pattern completed yet.', twist:'The twist', story:'The story', trad:'Traditional card',
   grito:'Grito', you:'You', player:'Player', turnOf:'Board of', away:'1 to go', out:'out', strikes:'strikes', newRound:'New round', callerStart:'Tap “Next card” to call the first card.',
   pats:{ row:'Line (row)', col:'Column', diag:'Diagonal', corners:'Four corners', centro:'Center', llena:'Full board' },
-  cardsLeft:'left', printed:'Printed tablas 1–12', randomBoards:'Random tablas', ai:'rival', soundOn:'Sound', backToGame:'Back to game'
+  cardsLeft:'left', printed:'Printed boards 1–12', randomBoards:'Random boards', ai:'rival', board:'Board', soundOn:'Sound', backToGame:'Back to game'
  }
 };
-function t(k) { var d = T[S.lang] || T.es; return d[k] != null ? d[k] : T.es[k]; }
+function t(k) { var d = T[S.lang] || T.en; return d[k] != null ? d[k] : T.en[k]; }
 function patName(p) { return t('pats')[p]; }
 
 /* ---------- patterns ---------- */
@@ -76,8 +84,8 @@ function thumb(n) { return CARD[n].thumb; }
 function shuffle(a, rnd) { rnd = rnd || Math.random; a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
 function allNums() { return DATA.cards.map(function (c) { return c.n; }); }
 function randomTabla() { return shuffle(allNums()).slice(0, 16); }
-function gritoOf(n) { var c = CARD[n]; return S.lang === 'en' ? c.grito_en : c.grito_es; }
-function gritoAlt(n) { var c = CARD[n]; return S.lang === 'en' ? c.grito_es : c.grito_en; }
+function gritoOf(n) { var c = CARD[n]; return c.grito_es; }
+function gritoAlt(n) { var c = CARD[n]; return c.grito_en; }
 
 /* ---------- audio (WebAudio, generated; unlocked on first tap for iOS) ---------- */
 var AC = null, droneNodes = null, unlocked = false;
@@ -139,7 +147,7 @@ function say(text, lang, rate) {
 }
 function sing(n) {
  if (!S.voice || !window.speechSynthesis) return; try { speechSynthesis.cancel(); } catch (e) {}
- say(gritoOf(n), S.lang, 0.95); say(CARD[n].name, 'es', 0.9);
+ say(gritoOf(n), 'es', 0.95); say(CARD[n].name, 'es', 0.9);
 }
 
 /* ---------- wake lock (keeps phone screen on while playing) ---------- */
@@ -211,12 +219,12 @@ SCREENS.title = function () {
   '<button class="btn ghost" data-act="settings">⚙ ' + t('settings') + '</button>' +
   (deferredInstall ? '<button class="btn gold" data-act="install">⬇ ' + t('install') + '</button>' : '') +
   '</nav>' +
-  '<div class="lang" role="group" aria-label="' + t('language') + '"><button class="chip" data-lang="es" aria-pressed="' + (S.lang === 'es') + '">Español</button><button class="chip" data-lang="en" aria-pressed="' + (S.lang === 'en') + '">English</button></div>' +
+  '<div class="lang" role="group" aria-label="' + t('language') + '"><button class="chip" data-lang="en" aria-pressed="' + (S.lang === 'en') + '">English</button><button class="chip" data-lang="es" aria-pressed="' + (S.lang === 'es') + '">Español</button></div>' +
   (isIOS && !standalone ? '<p class="foot">' + t('iosHint') + '</p>' : '') +
   '<p class="foot">' + t('offline') + '</p>' +
   '</div></section>';
  bindCommon();
- $$('[data-lang]').forEach(function (b) { b.onclick = function () { S.lang = b.dataset.lang; document.documentElement.lang = S.lang; save(); SCREENS.title(); }; });
+ $$('[data-lang]').forEach(function (b) { b.onclick = function () { chooseLanguage(b.dataset.lang); save(); SCREENS.title(); }; });
  var ib = $('[data-act="install"]'); if (ib) ib.onclick = function () { deferredInstall.prompt(); deferredInstall.userChoice.finally(function () { deferredInstall = null; SCREENS.title(); }); };
 };
 function bindCommon(root) {
@@ -228,13 +236,13 @@ function bindCommon(root) {
 function toggleRow(key, label) { return '<button class="btn ghost" style="width:100%;justify-content:space-between;display:flex;align-items:center;margin:6px 0" data-tog="' + key + '" aria-pressed="' + !!S[key] + '"><span>' + label + '</span><span>' + (S[key] ? 'ON' : 'OFF') + '</span></button>'; }
 function settingsModal() {
  var m = openModal('<button class="icon-btn close" data-close aria-label="' + t('close') + '">✕</button><h2>' + t('settings') + '</h2>' +
-  '<h3>' + t('language') + '</h3><div class="opts"><button class="chip" data-lang="es" aria-pressed="' + (S.lang === 'es') + '">Español</button><button class="chip" data-lang="en" aria-pressed="' + (S.lang === 'en') + '">English</button></div>' +
+  '<h3>' + t('language') + '</h3><div class="opts"><button class="chip" data-lang="en" aria-pressed="' + (S.lang === 'en') + '">English</button><button class="chip" data-lang="es" aria-pressed="' + (S.lang === 'es') + '">Español</button></div>' +
   '<h3>' + t('soundOn') + '</h3>' + toggleRow('voice', '🗣 ' + t('voice')) + toggleRow('sfx', '🔔 ' + t('sfx')) + toggleRow('drone', '〰 ' + t('drone')) +
   '<h3>' + t('speed') + '</h3><div class="opts">' + ['manual', 'slow', 'normal', 'fast'].map(function (k) { return '<button class="chip" data-speed="' + k + '" aria-pressed="' + (S.speed === k) + '">' + t(k) + '</button>'; }).join('') + '</div>' +
   '<h3>⚙</h3>' + toggleRow('auto', '✋ ' + t('automark')) + toggleRow('calm', '🕯 ' + t('calm')), function () { rerender(); });
  $$('[data-tog]', m).forEach(function (b) { b.onclick = function () { var k = b.dataset.tog; S[k] = !S[k]; save(); b.setAttribute('aria-pressed', S[k]); b.lastChild.textContent = S[k] ? 'ON' : 'OFF';
   if (k === 'drone') { S.drone ? startDrone() : stopDrone(); } if (k === 'voice' && !S.voice && window.speechSynthesis) speechSynthesis.cancel(); if (k === 'auto' && S.auto && G && !G.over) autoMarkAll(); }; });
- $$('[data-lang]', m).forEach(function (b) { b.onclick = function () { S.lang = b.dataset.lang; document.documentElement.lang = S.lang; save(); closeModal(); settingsModal(); }; });
+ $$('[data-lang]', m).forEach(function (b) { b.onclick = function () { chooseLanguage(b.dataset.lang); save(); closeModal(); settingsModal(); }; });
  $$('[data-speed]', m).forEach(function (b) { b.onclick = function () { S.speed = b.dataset.speed; save(); $$('[data-speed]', m).forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); }; });
 }
 function rerender() { if (current === 'title') SCREENS.title(); else if (current === 'game') renderGame(); else if (current === 'caller') renderCaller(); else if (current === 'baraja') SCREENS.baraja(); else if (current === 'rules') SCREENS.rules(); else if (current === 'setup') SCREENS.setup(SETUP.mode); }
@@ -247,7 +255,7 @@ SCREENS.setup = function (mode) {
  var tablas = '';
  if (solo) {
   tablas = '<h3>' + t('tabla') + '</h3><div class="tablas">' + DATA.tablas.map(function (b, i) {
-   return '<button class="tpick" data-tabla="' + (i + 1) + '" aria-pressed="' + (SETUP.tabla === i + 1) + '" aria-label="Tabla ' + (i + 1) + '"><div class="mini">' + b.map(function (n) { return '<img loading="lazy" src="' + thumb(n) + '" alt="">'; }).join('') + '</div><div class="lbl">Tabla ' + (i + 1) + '</div></button>';
+   return '<button class="tpick" data-tabla="' + (i + 1) + '" aria-pressed="' + (SETUP.tabla === i + 1) + '" aria-label="' + t('board') + ' ' + (i + 1) + '"><div class="mini">' + b.map(function (n) { return '<img loading="lazy" src="' + thumb(n) + '" alt="">'; }).join('') + '</div><div class="lbl">' + t('board') + ' ' + (i + 1) + '</div></button>';
   }).join('') + '<button class="tpick rand" data-tabla="0" aria-pressed="' + (SETUP.tabla === 0) + '"><div class="mini">🎲</div><div class="lbl">' + t('random') + '</div></button></div>';
  }
  var ppl = '';
@@ -532,6 +540,17 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(function (e) { console.warn('SW', e); }); });
 }
 
+// Shared site controls and other tabs update chrome without restarting a round.
+window.addEventListener('botwave:language', function (event) {
+ if (!event.detail || event.detail.origin === 'card-game') return;
+ S.lang = event.detail.lang === 'es' ? 'es' : 'en';
+ if (DATA) { closeModal(true); rerender(); }
+});
+window.addEventListener('storage', function (event) {
+ if (window.BotwaveLocale || event.key !== LANGUAGE_KEY) return;
+ S.lang = event.newValue === 'es' ? 'es' : 'en'; document.documentElement.lang = S.lang;
+ if (DATA) { closeModal(true); rerender(); }
+});
 /* ---------- boot ---------- */
 applyCalm(); document.documentElement.lang = S.lang;
 fetch('data/cards.json').then(function (r) { return r.json(); }).then(function (d) {
