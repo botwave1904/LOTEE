@@ -26,7 +26,7 @@ h1{font-size:clamp(2.65rem,6.4vw,5.1rem);letter-spacing:-.045em;font-weight:700}
 /* Decorative cards stay inside their grid cell; no text overlap or page overflow. */
 @layer layout{
 .hero-copy{min-width:0}.fan{min-width:0;overflow:clip}
-@media(min-width:850px){.hero.universe{grid-template-columns:minmax(0,1.12fr) minmax(0,1fr)}}}
+@media(min-width:850px){.hero.universe{grid-template-columns:minmax(0,1.12fr) minmax(0,1fr)}}
 }
 
 @layer components{@media(min-width:850px){.fan img{height:72%;top:14%}}}
