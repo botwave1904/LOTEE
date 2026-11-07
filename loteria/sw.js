@@ -1,6 +1,6 @@
 /* lotee service worker - precaches every asset so the game works fully offline. MIT. */
 const CACHE_PREFIX = 'lotee-pwa|' + new URL('./', self.location.href).pathname + '|';
-const VERSION = CACHE_PREFIX + '920ffb968fa968';
+const VERSION = CACHE_PREFIX + 'd9a2144df113cd';
 const ASSETS = [
   '../assets/site.css', '../assets/Lato.woff2', '../assets/Lato-Bold.woff2', '../assets/AlfaSlabOne.woff2',
   './',
