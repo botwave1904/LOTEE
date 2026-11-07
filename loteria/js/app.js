@@ -49,7 +49,7 @@ var T = {
   winCard:'On the card', deckEnd:'The deck is empty.', voice:'Caller voice', sfx:'Sound effects', drone:'Ambient drone', calm:'Fewer effects (no flicker)',
   language:'Language', close:'Close', undo:'Undo', shuffle:'Reshuffle', verify:'Check a board', fullscreen:'Full screen',
   verifyTitle:'Which board called it?', verifyOk:'Good! It completes', verifyNo:'No pattern completed yet.', twist:'The twist', story:'The story', trad:'Traditional card',
-  grito:'Grito', you:'You', player:'Player', turnOf:'Board of', away:'1 to go', out:'out', strikes:'strikes', newRound:'New round', callerStart:'Tap “Next card” to call the first card.',
+  grito:'Caller verse', you:'You', player:'Player', turnOf:'Board of', away:'1 to go', out:'out', strikes:'strikes', newRound:'New round', callerStart:'Tap “Next card” to call the first card.',
   pats:{ row:'Line (row)', col:'Column', diag:'Diagonal', corners:'Four corners', centro:'Center', llena:'Full board' },
   cardsLeft:'left', printed:'Printed boards 1–12', randomBoards:'Random boards', ai:'rival', board:'Board', soundOn:'Sound', backToGame:'Back to game'
  }
