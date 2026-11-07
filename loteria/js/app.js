@@ -84,8 +84,14 @@ function thumb(n) { return CARD[n].thumb; }
 function shuffle(a, rnd) { rnd = rnd || Math.random; a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
 function allNums() { return DATA.cards.map(function (c) { return c.n; }); }
 function randomTabla() { return shuffle(allNums()).slice(0, 16); }
-function gritoOf(n) { var c = CARD[n]; return c.grito_es; }
-function gritoAlt(n) { var c = CARD[n]; return c.grito_en; }
+function gritoOf(n) { var c = CARD[n]; return S.lang === 'en' ? c.grito_en : c.grito_es; }
+function gritoAlt(n) { var c = CARD[n]; return S.lang === 'en' ? c.grito_es : c.grito_en; }
+function storyOf(c) {
+ if (S.lang === 'en' && c.n === 30) return 'The shrimp that falls asleep is carried away by the current: the feed is the current now.';
+ if (S.lang === 'en' && c.n === 50) return "The fish dies by its own mouth, and the line runs to a reply that is still being typed.";
+ return c.story;
+}
+
 
 /* ---------- audio (WebAudio, generated; unlocked on first tap for iOS) ---------- */
 var AC = null, droneNodes = null, unlocked = false;
@@ -147,7 +153,7 @@ function say(text, lang, rate) {
 }
 function sing(n) {
  if (!S.voice || !window.speechSynthesis) return; try { speechSynthesis.cancel(); } catch (e) {}
- say(gritoOf(n), 'es', 0.95); say(CARD[n].name, 'es', 0.9);
+ say(gritoOf(n), S.lang, 0.95); say(CARD[n].name, 'es', 0.9);
 }
 
 /* ---------- wake lock (keeps phone screen on while playing) ---------- */
@@ -182,9 +188,9 @@ function cardModal(n) {
  openModal('<button class="icon-btn close" data-close aria-label="' + t('close') + '">✕</button>' +
   '<img class="bigcard" src="' + c.img + '" alt="' + esc(c.n + '. ' + c.name) + '">' +
   '<h2 style="text-align:center">' + c.n + '. ' + esc(c.name) + '</h2>' +
-  '<dl class="cardinfo"><dt>' + t('grito') + '</dt><dd><i>“' + esc(gritoOf(n)) + '”</i><br><small style="opacity:.7">' + esc(gritoAlt(n)) + '</small></dd>' +
+  '<dl class="cardinfo"><dt>' + t('grito') + '</dt><dd><i>“' + esc(gritoOf(n)) + '”</i></dd>' +
   (c.traditional !== c.name ? '<dt>' + t('trad') + '</dt><dd>' + esc(c.traditional) + '</dd>' : '') +
-  '<dt>' + t('twist') + '</dt><dd>' + esc(c.twist) + '</dd><dt>' + t('story') + '</dt><dd>' + esc(c.story) + '</dd></dl>');
+  '<dt>' + t('twist') + '</dt><dd>' + esc(c.twist) + '</dd><dt>' + t('story') + '</dt><dd>' + esc(storyOf(c)) + '</dd></dl>');
 }
 
 /* ---------- navigation (Android back button closes modal / returns) ---------- */
@@ -399,7 +405,7 @@ function updateCounter() { var c = $('#counter'); if (c) c.textContent = G.drawn
 function showCall(n, animate) {
  var c = CARD[n], img = $('#callimg'), flip = $('#flip'); if (!img) return;
  $('#callnum').textContent = '#' + c.n; $('#callname').textContent = c.name;
- $('#grito').innerHTML = '“' + esc(gritoOf(n)) + '”<small>' + esc(gritoAlt(n)) + '</small>';
+ $('#grito').innerHTML = '“' + esc(gritoOf(n)) + '”';
  if (!animate || reduceMotion) { img.src = c.img; flip.classList.add('show'); return; }
  flip.style.transition = 'none'; flip.classList.remove('show'); void flip.offsetWidth; flip.style.transition = '';
  var done = false, go2 = function () { if (done) return; done = true; requestAnimationFrame(function () { flip.classList.add('show'); }); };
@@ -465,9 +471,9 @@ function rulesHtml() {
   '<h3>Modo Cantor</h3><p>Para noches de juego con las tablas impresas: pon el teléfono o la laptop en la tele, canta con “Siguiente” y usa “Verificar tabla” cuando alguien grite lotería.</p>'
   :
   '<p>Lotería grew out of the number lotteries brought from Spain and Italy; in Mexico it became a picture game played at fairs and at home. This deck is a modern-horror remix of the 54 traditional cards.</p>' +
-  '<h3>How to play</h3><ol><li>Agree on the winning pattern before the round.</li><li>The caller (el cantor) draws one card at a time and “sings” it: the grito first, then the name.</li><li>If the card is on your tabla, drop a bean on it (tap the cell). You are responsible for your own board.</li><li>Whoever completes the pattern shouts <b>¡Lotería!</b> The caller checks every marked card against the called ones.</li><li><b>False lotería:</b> the first one is a warning; a second one puts you out for the round.</li><li>Then all 54 cards are reshuffled and someone else calls.</li></ol>' +
-  '<h3>Patterns</h3>' + pats + '<p>Any row, any column and either diagonal count for their pattern. “Llena” is the whole board.</p>' +
-  '<h3>Caller mode</h3><p>For game nights with the printed tablas: put a phone or laptop on the TV, call cards with “Next card” and use “Check a tabla” when someone shouts lotería.</p>';
+  '<h3>How to play</h3><ol><li>Agree on the winning pattern before the round.</li><li>The caller draws one card at a time and calls it: the verse first, then the name.</li><li>If the card is on your board, drop a bean on it (tap the cell). You are responsible for your own board.</li><li>Whoever completes the pattern shouts <b>¡Lotería!</b> The caller checks every marked card against the called ones.</li><li><b>False lotería:</b> the first one is a warning; a second one puts you out for the round.</li><li>Then all 54 cards are reshuffled and someone else calls.</li></ol>' +
+  '<h3>Patterns</h3>' + pats + '<p>Any row, any column and either diagonal count for their pattern. “Full board” means covering every card.</p>' +
+  '<h3>Caller mode</h3><p>For game nights with the printed boards: put a phone or laptop on the TV, call cards with “Next card” and use “Check a tabla” when someone shouts lotería.</p>';
 }
 SCREENS.rules = function () {
  app.innerHTML = '<section class="screen"><header class="topbar"><button class="icon-btn" data-act="back" aria-label="' + t('back') + '">←</button><div class="ttl">' + t('rules') + '</div><button class="icon-btn" data-act="settings" aria-label="' + t('settings') + '">⚙</button></header><div class="scroll rules">' + rulesHtml() + '</div></section>';

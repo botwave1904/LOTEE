@@ -49,6 +49,7 @@
  window.BotwaveLocale={KEY,get lang(){return lang;},choose,apply};
  document.addEventListener('click',e=>{const button=e.target.closest('button[data-site-language]');if(button)choose(button.dataset.siteLanguage);});
  document.addEventListener('DOMContentLoaded',apply,{once:true});
+ window.addEventListener('pageshow',()=>{let saved='en';try{if(localStorage.getItem(KEY)==='es')saved='es';}catch{}if(saved!==lang)choose(saved,'history',false);else apply();});
  window.addEventListener('storage',e=>{if(e.key===KEY)choose(e.newValue==='es'?'es':'en','storage',false);});
 })();
 </script><meta content="en_US" data-en-content="en_US" data-es-content="es_MX" property="og:locale"/></head>
